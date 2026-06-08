@@ -59,7 +59,11 @@ class AgregarDispositivoActivity : AppCompatActivity() {
                     Toast.makeText(this@AgregarDispositivoActivity, msg, Toast.LENGTH_SHORT).show()
                     viewModel.limpiarMensaje()
                     setResult(RESULT_OK)
-                    finish()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        if (!isFinishing) {
+                            finish()
+                        }
+                    }
                 }
             }
         }

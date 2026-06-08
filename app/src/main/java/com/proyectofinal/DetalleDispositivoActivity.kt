@@ -118,11 +118,15 @@ class DetalleDispositivoActivity : AppCompatActivity() {
     private fun observarViewModel() {
         lifecycleScope.launch {
             viewModel.mensaje.collect { msg ->
-                msg?.let {
-                    Toast.makeText(this@DetalleDispositivoActivity, it, Toast.LENGTH_SHORT).show()
+                if (msg != null) {
+                    Toast.makeText(this@DetalleDispositivoActivity, msg, Toast.LENGTH_SHORT).show()
                     viewModel.limpiarMensaje()
                     setResult(RESULT_OK)
-                    finish()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        if (!isFinishing) {
+                            finish()
+                        }
+                    }
                 }
             }
         }
