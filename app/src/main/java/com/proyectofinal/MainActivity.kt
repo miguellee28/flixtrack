@@ -12,10 +12,12 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -45,12 +47,28 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) {
         viewModel.cargarDispositivos()
+        viewModel.cargarHomeData()
+        viewModel.cargarCalendarioData()
     }
 
     private val resultadoDetalleDispositivo = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         viewModel.cargarDispositivos()
+    }
+
+    private val resultadoAgregarTarea = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        viewModel.cargarHomeData()
+        viewModel.cargarCalendarioData()
+    }
+
+    private val resultadoTareaDetalle = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        viewModel.cargarHomeData()
+        viewModel.cargarCalendarioData()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,11 +90,15 @@ class MainActivity : AppCompatActivity() {
         cargarPreferencias()
         configurarBarra()
         observarDispositivos()
+        observarHomeData()
+        observarCalendarioData()
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.cargarDispositivos()
+        viewModel.cargarHomeData()
+        viewModel.cargarCalendarioData()
     }
 
     private fun observarDispositivos() {
@@ -88,6 +110,173 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun observarHomeData() {
+        lifecycleScope.launch {
+            viewModel.tareasPasadas.collect { lista ->
+                actualizarSeccionAtrasadas(lista)
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.tareasProximas.collect { lista ->
+                actualizarSeccionPorHacer(lista)
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.tareasLejanas.collect { lista ->
+                actualizarSeccionProximo(lista)
+            }
+        }
+    }
+
+    private fun observarCalendarioData() {
+        lifecycleScope.launch {
+            viewModel.tareaSeleccionada.collect { tab ->
+                actualizarCalendarioSegunTab(tab)
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.tareasPasadas.collect { lista ->
+                if (viewModel.tareaSeleccionada.value == "atrasado") {
+                    actualizarListaCalendario(lista)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.tareasProximas.collect { lista ->
+                if (viewModel.tareaSeleccionada.value == "proximo") {
+                    actualizarListaCalendario(lista)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.tareasCompletadas.collect { lista ->
+                if (viewModel.tareaSeleccionada.value == "completado") {
+                    actualizarListaCalendario(lista)
+                }
+            }
+        }
+    }
+
+    private fun actualizarSeccionAtrasadas(items: List<ItemProgramado>) {
+        val seccion = contenedorPantallas.findViewById<LinearLayout>(R.id.seccion_atrasadas) ?: return
+        seccion.removeAllViews()
+
+        val header = LayoutInflater.from(this).inflate(R.layout.section_header, seccion, false)
+        header.findViewById<TextView>(R.id.texto_titulo_seccion).text = "Atrasado"
+        header.findViewById<TextView>(R.id.texto_contador).text = "${items.size} items"
+        seccion.addView(header)
+
+        if (items.isEmpty()) {
+            val vacio = TextView(this).apply {
+                text = "No hay tareas atrasadas"
+                textSize = 14f
+                setPadding(32, 16, 32, 16)
+                setTextColor(resources.getColor(android.R.color.darker_gray, theme))
+            }
+            seccion.addView(vacio)
+        } else {
+            for (grupo in agruparPorFechaYDispositivo(items)) {
+                agregarCardGrupoInicio(seccion, grupo)
+            }
+        }
+    }
+
+    private fun actualizarSeccionPorHacer(items: List<ItemProgramado>) {
+        val seccion = contenedorPantallas.findViewById<LinearLayout>(R.id.seccion_por_hacer) ?: return
+        seccion.removeAllViews()
+
+        val header = LayoutInflater.from(this).inflate(R.layout.section_header, seccion, false)
+        header.findViewById<TextView>(R.id.texto_titulo_seccion).text = "Por Hacer"
+        header.findViewById<TextView>(R.id.texto_contador).text = "${items.size} items"
+        seccion.addView(header)
+
+        if (items.isEmpty()) {
+            val vacio = TextView(this).apply {
+                text = "No hay tareas pendientes"
+                textSize = 14f
+                setPadding(32, 16, 32, 16)
+                setTextColor(resources.getColor(android.R.color.darker_gray, theme))
+            }
+            seccion.addView(vacio)
+        } else {
+            for (grupo in agruparPorFechaYDispositivo(items)) {
+                agregarCardGrupoInicio(seccion, grupo)
+            }
+        }
+    }
+
+    private fun actualizarSeccionProximo(items: List<ItemProgramado>) {
+        val seccion = contenedorPantallas.findViewById<LinearLayout>(R.id.seccion_proximo) ?: return
+        seccion.removeAllViews()
+
+        val header = LayoutInflater.from(this).inflate(R.layout.section_header, seccion, false)
+        header.findViewById<TextView>(R.id.texto_titulo_seccion).text = "Proximo"
+        header.findViewById<TextView>(R.id.texto_contador).text = "${items.size} items"
+        seccion.addView(header)
+
+        if (items.isEmpty()) {
+            val vacio = TextView(this).apply {
+                text = "No hay tareas proximas"
+                textSize = 14f
+                setPadding(32, 16, 32, 16)
+                setTextColor(resources.getColor(android.R.color.darker_gray, theme))
+            }
+            seccion.addView(vacio)
+        } else {
+            for (grupo in agruparPorFechaYDispositivo(items)) {
+                agregarCardGrupoProximo(seccion, grupo)
+            }
+        }
+    }
+
+    private fun agruparPorFechaYDispositivo(items: List<ItemProgramado>): List<List<ItemProgramado>> {
+        return items.groupBy { Pair(it.fecha, it.nombreDispositivo.ifBlank { "Sin dispositivo" }) }.values.toList()
+    }
+
+    private fun agregarCardGrupoInicio(seccion: LinearLayout, grupo: List<ItemProgramado>) {
+        val primero = grupo.firstOrNull() ?: return
+        val dispositivo = primero.nombreDispositivo.ifBlank { "Sin dispositivo" }
+        val vista = LayoutInflater.from(this).inflate(R.layout.item_tarea_inicio, seccion, false)
+        vista.findViewById<TextView>(R.id.texto_nombre_tarea).text = dispositivo
+        vista.findViewById<TextView>(R.id.texto_descripcion_tarea).text = resumenGrupo(grupo)
+        vista.findViewById<TextView>(R.id.texto_nombre_dispositivo).text = "${primero.fecha} - ${textoCantidadGrupo(grupo)}"
+        vista.findViewById<Button>(R.id.boton_ver).apply {
+            visibility = View.VISIBLE
+            setOnClickListener { abrirDetalleGrupo(grupo) }
+        }
+        seccion.addView(vista)
+    }
+
+    private fun agregarCardGrupoProximo(seccion: LinearLayout, grupo: List<ItemProgramado>) {
+        val primero = grupo.firstOrNull() ?: return
+        val dispositivo = primero.nombreDispositivo.ifBlank { "Sin dispositivo" }
+        val vista = LayoutInflater.from(this).inflate(R.layout.item_tarea_proximo, seccion, false)
+        vista.findViewById<TextView>(R.id.texto_fecha).text = primero.fecha
+        vista.findViewById<TextView>(R.id.texto_nombre_tarea).text = dispositivo
+        vista.findViewById<TextView>(R.id.texto_nombre_dispositivo).text = resumenGrupo(grupo)
+        vista.findViewById<Button>(R.id.boton_ver).apply {
+            visibility = View.VISIBLE
+            setOnClickListener { abrirDetalleGrupo(grupo) }
+        }
+        seccion.addView(vista)
+    }
+
+    private fun resumenGrupo(grupo: List<ItemProgramado>): String {
+        return grupo.joinToString(separator = "\n") { item ->
+            val tipo = if (item.tipo == "tarea") "Mantenimiento" else "Inspeccion"
+            "$tipo: ${item.nombre}"
+        }
+    }
+
+    private fun textoCantidadGrupo(grupo: List<ItemProgramado>): String {
+        return if (grupo.size == 1) "1 item" else "${grupo.size} items"
+    }
+
+    private fun abrirDetalleGrupo(grupo: List<ItemProgramado>) {
+        val tarea = grupo.firstOrNull { it.tipo == "tarea" }
+        abrirDetalleItem(tarea ?: grupo.first())
     }
 
     private fun cargarPreferencias() {
@@ -109,11 +298,11 @@ class MainActivity : AppCompatActivity() {
         agregarOpcion(menuBarra, ID_CALENDARIO, R.drawable.ic_calendario, "Calendario")
         agregarOpcion(menuBarra, ID_DISPOSITIVOS, R.drawable.ic_dispositivos, "Dispositivos")
         agregarOpcion(menuBarra, ID_AJUSTES, R.drawable.ic_ajustes, "Ajustes")
-        barraNavegacion.selectedItemId = ID_INICIO
-
         barraNavegacion.setOnItemSelectedListener { elemento ->
             procesarSeleccion(elemento)
         }
+
+        barraNavegacion.selectedItemId = ID_INICIO
     }
 
     private fun agregarOpcion(menu: Menu, id: Int, icono: Int, titulo: String) {
@@ -123,7 +312,8 @@ class MainActivity : AppCompatActivity() {
     private fun procesarSeleccion(elemento: MenuItem): Boolean {
         return when (elemento.itemId) {
             ID_INICIO -> {
-                mostrarPantalla(R.layout.layout_inicio)
+                mostrarInicio()
+                viewModel.cargarHomeData()
                 true
             }
             ID_DISPOSITIVOS -> {
@@ -136,6 +326,8 @@ class MainActivity : AppCompatActivity() {
             }
             ID_CALENDARIO -> {
                 mostrarPantalla(R.layout.layout_calendario)
+                configurarCalendario()
+                viewModel.cargarCalendarioData()
                 true
             }
             ID_AJUSTES -> {
@@ -145,6 +337,13 @@ class MainActivity : AppCompatActivity() {
             }
             else -> false
         }
+    }
+
+    private fun mostrarInicio() {
+        mostrarPantalla(R.layout.layout_inicio)
+        actualizarSeccionAtrasadas(viewModel.tareasPasadas.value)
+        actualizarSeccionPorHacer(viewModel.tareasProximas.value)
+        actualizarSeccionProximo(viewModel.tareasLejanas.value)
     }
 
     private fun asignarListaDispositivos() {
@@ -166,6 +365,72 @@ class MainActivity : AppCompatActivity() {
                 putExtra(DetalleDispositivoActivity.EXTRA_MODELO, dispositivo.modelo)
             }
             resultadoDetalleDispositivo.launch(intent)
+        }
+    }
+
+    private fun configurarCalendario() {
+        val botonProximo = contenedorPantallas.findViewById<Button>(R.id.boton_proximo)
+        val botonAtrasado = contenedorPantallas.findViewById<Button>(R.id.boton_atrasado)
+        val botonCompletado = contenedorPantallas.findViewById<Button>(R.id.boton_completado)
+        val botonAgregar = contenedorPantallas.findViewById<Button>(R.id.boton_agregar_tarea_calendario)
+        val listaCalendario = contenedorPantallas.findViewById<ListView>(R.id.lista_calendario)
+
+        val actualizarSeleccion = { seleccion: String ->
+            val botones = listOf(botonProximo, botonAtrasado, botonCompletado)
+            for (btn in botones) {
+                btn?.alpha = 0.5f
+            }
+            when (seleccion) {
+                "proximo" -> botonProximo?.alpha = 1.0f
+                "atrasado" -> botonAtrasado?.alpha = 1.0f
+                "completado" -> botonCompletado?.alpha = 1.0f
+            }
+            viewModel.seleccionarTabCalendario(seleccion)
+        }
+
+        botonProximo?.setOnClickListener { actualizarSeleccion("proximo") }
+        botonAtrasado?.setOnClickListener { actualizarSeleccion("atrasado") }
+        botonCompletado?.setOnClickListener { actualizarSeleccion("completado") }
+
+        botonAgregar?.setOnClickListener {
+            val intent = Intent(this, AgregarTareaActivity::class.java)
+            resultadoAgregarTarea.launch(intent)
+        }
+
+        actualizarSeleccion(viewModel.tareaSeleccionada.value)
+        actualizarCalendarioSegunTab(viewModel.tareaSeleccionada.value)
+    }
+
+    private fun actualizarCalendarioSegunTab(tab: String) {
+        val listaCalendario = contenedorPantallas.findViewById<ListView>(R.id.lista_calendario) ?: return
+        when (tab) {
+            "proximo" -> listaCalendario.adapter = AdaptadorTareasCalendario(this, viewModel.tareasProximas.value, ::abrirDetalleGrupo)
+            "atrasado" -> listaCalendario.adapter = AdaptadorTareasCalendario(this, viewModel.tareasPasadas.value, ::abrirDetalleGrupo)
+            "completado" -> listaCalendario.adapter = AdaptadorTareasCalendario(this, viewModel.tareasCompletadas.value, ::abrirDetalleGrupo)
+        }
+    }
+
+    private fun actualizarListaCalendario(items: List<ItemProgramado>) {
+        val listaCalendario = contenedorPantallas.findViewById<ListView>(R.id.lista_calendario) ?: return
+        listaCalendario.adapter = AdaptadorTareasCalendario(this, items, ::abrirDetalleGrupo)
+    }
+
+    private fun abrirDetalleItem(item: ItemProgramado) {
+        if (item.tipo == "tarea") {
+            val intent = Intent(this, TareaDetalleActivity::class.java).apply {
+                putExtra(TareaDetalleActivity.EXTRA_TAREA_ID, item.id)
+                putExtra(TareaDetalleActivity.EXTRA_TAREA_NOMBRE, item.nombre)
+                putExtra(TareaDetalleActivity.EXTRA_DISPOSITIVO_NOMBRE, item.nombreDispositivo)
+                putExtra(TareaDetalleActivity.EXTRA_TAREA_FECHA, item.fecha)
+            }
+            resultadoTareaDetalle.launch(intent)
+        } else {
+            val dispositivo = item.nombreDispositivo.ifBlank { "Sin dispositivo" }
+            AlertDialog.Builder(this)
+                .setTitle(item.nombre)
+                .setMessage("Inspeccion\nFecha: ${item.fecha}\nDispositivo: $dispositivo\n\n${item.descripcion}")
+                .setPositiveButton("Cerrar", null)
+                .show()
         }
     }
 
@@ -218,6 +483,51 @@ class MainActivity : AppCompatActivity() {
             vista.findViewById<TextView>(R.id.texto_modelo).text = dispositivo.modelo
 
             return vista
+        }
+    }
+
+    class AdaptadorTareasCalendario(
+        private val contexto: Context,
+        private val items: List<ItemProgramado>,
+        private val onVerClick: (List<ItemProgramado>) -> Unit
+    ) : BaseAdapter() {
+
+        private val grupos = items
+            .groupBy { Pair(it.fecha, it.nombreDispositivo.ifBlank { "Sin dispositivo" }) }
+            .values
+            .toList()
+
+        override fun getCount() = grupos.size
+        override fun getItem(posicion: Int) = grupos[posicion]
+        override fun getItemId(posicion: Int) = grupos[posicion].firstOrNull()?.id ?: posicion.toLong()
+
+        override fun getView(posicion: Int, vistaReciclada: View?, parent: ViewGroup): View {
+            val vista = vistaReciclada ?: LayoutInflater.from(contexto)
+                .inflate(R.layout.item_tarea_inicio, parent, false)
+
+            val grupo = grupos[posicion]
+            val primero = grupo.first()
+            val dispositivo = primero.nombreDispositivo.ifBlank { "Sin dispositivo" }
+            vista.findViewById<TextView>(R.id.texto_nombre_tarea).text = dispositivo
+            vista.findViewById<TextView>(R.id.texto_descripcion_tarea).text = resumenGrupoCalendario(grupo)
+            vista.findViewById<TextView>(R.id.texto_nombre_dispositivo).text = "${primero.fecha} - ${textoCantidadGrupoCalendario(grupo)}"
+            vista.findViewById<Button>(R.id.boton_ver).apply {
+                visibility = View.VISIBLE
+                setOnClickListener { onVerClick(grupo) }
+            }
+
+            return vista
+        }
+
+        private fun resumenGrupoCalendario(grupo: List<ItemProgramado>): String {
+            return grupo.joinToString(separator = "\n") { item ->
+                val tipo = if (item.tipo == "tarea") "Mantenimiento" else "Inspeccion"
+                "$tipo: ${item.nombre}"
+            }
+        }
+
+        private fun textoCantidadGrupoCalendario(grupo: List<ItemProgramado>): String {
+            return if (grupo.size == 1) "1 item" else "${grupo.size} items"
         }
     }
 }

@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         const val DATABASE_NAME = "proyecto_final.db"
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
 
         // Tabla Dispositivos
         const val TABLE_DISPOSITIVOS = "dispositivos"
@@ -26,6 +26,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COL_TAREA_FECHA = "fecha"
         const val COL_TAREA_REPETIR = "repetir_cada"
         const val COL_TAREA_DISPOSITIVO_ID = "dispositivo_id"
+        const val COL_TAREA_COMPLETADA = "completada"
 
         // Tabla Inspecciones
         const val TABLE_INSPECCIONES = "inspecciones"
@@ -35,10 +36,23 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COL_INSPECCION_FECHA = "fecha"
         const val COL_INSPECCION_REPETIR = "repetir_cada"
         const val COL_INSPECCION_DISPOSITIVO_ID = "dispositivo_id"
+        const val COL_INSPECCION_COMPLETADA = "completada"
+
+        // Tabla TareaDetalles
+        const val TABLE_TAREA_DETALLES = "tarea_detalles"
+        const val COL_DETALLE_ID = "id"
+        const val COL_DETALLE_TAREA_ID = "tarea_id"
+        const val COL_DETALLE_TIPO = "tipo"
+        const val COL_DETALLE_NOMBRE = "nombre"
+        const val COL_DETALLE_DESCRIPCION = "descripcion"
+        const val COL_DETALLE_CONDICION = "condicion"
+        const val COL_DETALLE_NOTAS = "notas"
+        const val COL_DETALLE_FOTOS = "fotos"
+        const val COL_DETALLE_COMPLETADA = "completada"
+        const val COL_DETALLE_FECHA_COMPLETADA = "fecha_completada"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Crear tabla Dispositivos
         db.execSQL("""
             CREATE TABLE $TABLE_DISPOSITIVOS (
                 $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,7 +63,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             )
         """)
 
-        // Crear tabla Tareas
         db.execSQL("""
             CREATE TABLE $TABLE_TAREAS (
                 $COL_TAREA_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,11 +71,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 $COL_TAREA_FECHA TEXT NOT NULL,
                 $COL_TAREA_REPETIR TEXT NOT NULL,
                 $COL_TAREA_DISPOSITIVO_ID INTEGER,
+                $COL_TAREA_COMPLETADA INTEGER DEFAULT 0,
                 FOREIGN KEY ($COL_TAREA_DISPOSITIVO_ID) REFERENCES $TABLE_DISPOSITIVOS($COL_ID)
             )
         """)
 
-        // Crear tabla Inspecciones
         db.execSQL("""
             CREATE TABLE $TABLE_INSPECCIONES (
                 $COL_INSPECCION_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,15 +84,47 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 $COL_INSPECCION_FECHA TEXT NOT NULL,
                 $COL_INSPECCION_REPETIR TEXT NOT NULL,
                 $COL_INSPECCION_DISPOSITIVO_ID INTEGER,
+                $COL_INSPECCION_COMPLETADA INTEGER DEFAULT 0,
                 FOREIGN KEY ($COL_INSPECCION_DISPOSITIVO_ID) REFERENCES $TABLE_DISPOSITIVOS($COL_ID)
+            )
+        """)
+
+        db.execSQL("""
+            CREATE TABLE $TABLE_TAREA_DETALLES (
+                $COL_DETALLE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_DETALLE_TAREA_ID INTEGER NOT NULL,
+                $COL_DETALLE_TIPO TEXT NOT NULL,
+                $COL_DETALLE_NOMBRE TEXT NOT NULL,
+                $COL_DETALLE_DESCRIPCION TEXT DEFAULT '',
+                $COL_DETALLE_CONDICION TEXT DEFAULT '',
+                $COL_DETALLE_NOTAS TEXT DEFAULT '',
+                $COL_DETALLE_FOTOS TEXT DEFAULT '',
+                $COL_DETALLE_COMPLETADA INTEGER DEFAULT 0,
+                $COL_DETALLE_FECHA_COMPLETADA TEXT DEFAULT NULL,
+                FOREIGN KEY ($COL_DETALLE_TAREA_ID) REFERENCES $TABLE_TAREAS($COL_TAREA_ID)
             )
         """)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_INSPECCIONES")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_TAREAS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_DISPOSITIVOS")
-        onCreate(db)
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE $TABLE_TAREAS ADD COLUMN $COL_TAREA_COMPLETADA INTEGER DEFAULT 0")
+            db.execSQL("ALTER TABLE $TABLE_INSPECCIONES ADD COLUMN $COL_INSPECCION_COMPLETADA INTEGER DEFAULT 0")
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS $TABLE_TAREA_DETALLES (
+                    $COL_DETALLE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    $COL_DETALLE_TAREA_ID INTEGER NOT NULL,
+                    $COL_DETALLE_TIPO TEXT NOT NULL,
+                    $COL_DETALLE_NOMBRE TEXT NOT NULL,
+                    $COL_DETALLE_DESCRIPCION TEXT DEFAULT '',
+                    $COL_DETALLE_CONDICION TEXT DEFAULT '',
+                    $COL_DETALLE_NOTAS TEXT DEFAULT '',
+                    $COL_DETALLE_FOTOS TEXT DEFAULT '',
+                    $COL_DETALLE_COMPLETADA INTEGER DEFAULT 0,
+                    $COL_DETALLE_FECHA_COMPLETADA TEXT DEFAULT NULL,
+                    FOREIGN KEY ($COL_DETALLE_TAREA_ID) REFERENCES $TABLE_TAREAS($COL_TAREA_ID)
+                )
+            """)
+        }
     }
 }

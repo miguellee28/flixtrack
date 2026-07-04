@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:layout_marginEnd="8dp">
+
+    <ImageView
+        android:id="@+id/imagen_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/fondo_foto_redondeada"
+        android:scaleType="centerCrop" />
+
+    <ImageButton
+        android:id="@+id/boton_eliminar_foto"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:background="#80000000"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:contentDescription="Eliminar foto"
+        android:scaleType="centerInside"
+        android:layout_margin="2dp" />
+
+</FrameLayout>

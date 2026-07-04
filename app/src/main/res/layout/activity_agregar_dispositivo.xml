@@ -4,23 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp">
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp">
 
-    <!-- Titulo -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Agregar Dispositivo"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Toggle Manual / IA -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:padding="3dp"
+        android:background="@drawable/fondo_toggle_contenedor"
         android:layout_marginBottom="16dp">
 
         <Button
@@ -28,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:layout_marginEnd="2dp"
+            android:layout_marginEnd="3dp"
             android:text="Manual"
             android:background="@drawable/fondo_toggle_seleccionado"
             android:textColor="@color/white"
@@ -41,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:layout_marginStart="2dp"
+            android:layout_marginStart="3dp"
             android:text="IA"
             android:background="@drawable/fondo_toggle_no_seleccionado"
             android:textColor="@color/black"
@@ -51,7 +54,6 @@
 
     </LinearLayout>
 
-    <!-- Tarjetas con scroll -->
     <ScrollView
         android:id="@+id/scroll_lista"
         android:layout_width="match_parent"
@@ -61,19 +63,37 @@
         android:padding="8dp">
 
         <LinearLayout
-            android:id="@+id/contenedor_tarjetas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/contenedor_tarjetas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
 
     </ScrollView>
 
-    <!-- Boton Aceptar (siempre visible) -->
+    <LinearLayout
+        android:id="@+id/contenedor_botones_agregar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp" />
+
     <Button
         android:id="@+id/boton_aceptar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:text="Aceptar"
         android:textAllCaps="false" />
 

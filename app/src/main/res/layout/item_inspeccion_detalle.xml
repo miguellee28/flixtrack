@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/fondo_tarjeta"
+    android:padding="12dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="INSPECCION"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#006B3F"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/texto_nombre_inspeccion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DESCRIPCION"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:id="@+id/texto_descripcion_inspeccion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CONDICION"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:baselineAligned="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/boton_bueno"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:text="Bueno"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/boton_regular"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:text="Regular"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:backgroundTint="#FF9800"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/boton_malo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:text="Malo"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:backgroundTint="#F44336"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NOTAS"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="2dp" />
+
+    <EditText
+        android:id="@+id/campo_notas_inspeccion"
+        android:layout_width="match_parent"
+        android:layout_height="88dp"
+        android:background="@drawable/fondo_input_nota"
+        android:includeFontPadding="false"
+        android:hint="Escribe notas adicionales..."
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:minHeight="0dp"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="8dp"
+        android:textSize="13sp" />
+
+</LinearLayout>

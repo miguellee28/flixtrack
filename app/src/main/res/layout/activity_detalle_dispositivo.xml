@@ -8,7 +8,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -16,6 +19,8 @@
             android:text="Detalle del dispositivo"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp" />
 
         <FrameLayout
@@ -45,8 +50,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/fondo_tarjeta"
-            android:padding="12dp">
+            android:background="@drawable/fondo_tarjeta_dispositivo"
+            android:padding="12dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -59,9 +67,14 @@
             <EditText
                 android:id="@+id/campo_nombre"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="52dp"
+                android:background="@drawable/fondo_input_nota"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
                 android:inputType="text"
-                android:padding="8dp"
+                android:minHeight="0dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:textSize="13sp"
                 android:layout_marginBottom="8dp" />
 
@@ -76,9 +89,12 @@
             <Spinner
                 android:id="@+id/spinner_categoria"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="52dp"
+                android:background="@drawable/fondo_input_nota"
                 android:entries="@array/opciones_categoria"
-                android:padding="8dp"
+                android:minHeight="0dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:layout_marginBottom="8dp" />
 
             <TextView
@@ -92,9 +108,14 @@
             <EditText
                 android:id="@+id/campo_marca"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="52dp"
+                android:background="@drawable/fondo_input_nota"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
                 android:inputType="text"
-                android:padding="8dp"
+                android:minHeight="0dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:textSize="13sp"
                 android:layout_marginBottom="8dp" />
 
@@ -109,12 +130,57 @@
             <EditText
                 android:id="@+id/campo_modelo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="52dp"
+                android:background="@drawable/fondo_input_nota"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
                 android:inputType="text"
-                android:padding="8dp"
+                android:minHeight="0dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:textSize="13sp" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Calendario del dispositivo"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/boton_editar_calendario"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:minWidth="72dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="Editar"
+                android:textColor="#6750A4"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contenedor_calendario_dispositivo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
         <Button
             android:id="@+id/boton_guardar"

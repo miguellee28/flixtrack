@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/fondo_tarjeta"
+    android:padding="12dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MANTENIMIENTO"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#6750A4"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/texto_nombre_mantenimiento"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DESCRIPCION"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:id="@+id/texto_descripcion_mantenimiento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NOTA"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="2dp" />
+
+    <EditText
+        android:id="@+id/campo_notas_mantenimiento"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:background="@drawable/fondo_input_nota"
+        android:includeFontPadding="false"
+        android:hint="Escribe una nota..."
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:minHeight="0dp"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="8dp"
+        android:textSize="13sp" />
+
+</LinearLayout>

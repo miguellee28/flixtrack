@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/fondo_tarjeta"
+    android:background="@drawable/fondo_tarjeta_inspeccion"
     android:padding="12dp"
     android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp">
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="16dp">
 
     <!-- Titulo -->
     <TextView
@@ -29,10 +30,15 @@
     <EditText
         android:id="@+id/campo_nombre_inspeccion"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Ej: Inspección mensual"
+        android:layout_height="52dp"
+        android:background="@drawable/fondo_input_nota"
+        android:gravity="center_vertical"
+        android:hint="Ej: Revision de fugas"
+        android:includeFontPadding="false"
         android:inputType="text"
-        android:padding="8dp"
+        android:minHeight="0dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:textSize="13sp"
         android:layout_marginBottom="8dp" />
 
@@ -48,12 +54,15 @@
     <EditText
         android:id="@+id/campo_descripcion_inspeccion"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Describe la inspección..."
+        android:layout_height="52dp"
+        android:background="@drawable/fondo_input_nota"
+        android:hint="Ej: Verificar conexiones, presion y ruido"
+        android:includeFontPadding="false"
         android:inputType="textMultiLine"
-        android:minLines="2"
-        android:gravity="top"
-        android:padding="8dp"
+        android:gravity="center_vertical"
+        android:minHeight="0dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:textSize="13sp"
         android:layout_marginBottom="8dp" />
 
@@ -66,10 +75,23 @@
         android:textStyle="bold"
         android:layout_marginBottom="2dp" />
 
-    <CalendarView
-        android:id="@+id/calendario_inspeccion"
+    <TextView
+        android:id="@+id/texto_fecha_inspeccion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/fondo_fecha_editable"
+        android:clickable="true"
+        android:contentDescription="Cambiar fecha"
+        android:drawableEnd="@drawable/ic_editar_fecha"
+        android:drawablePadding="8dp"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#6750A4"
         android:layout_marginBottom="8dp" />
 
     <!-- Repetir cada -->

@@ -1,12 +1,15 @@
 package com.proyectofinal
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,7 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.Calendar
 import java.util.Locale
 
 class AgregarDispositivoActivity : AppCompatActivity() {
@@ -25,6 +28,7 @@ class AgregarDispositivoActivity : AppCompatActivity() {
     private lateinit var botonManual: Button
     private lateinit var botonIA: Button
     private lateinit var contenedorTarjetas: LinearLayout
+    private lateinit var contenedorBotonesAgregar: LinearLayout
     private lateinit var botonAceptar: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,13 +40,14 @@ class AgregarDispositivoActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { vista, insets ->
             val barrasSistema = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(barrasSistema.left, barrasSistema.top, barrasSistema.right, 0)
+            vista.setPadding(barrasSistema.left, barrasSistema.top, barrasSistema.right, barrasSistema.bottom)
             insets
         }
 
         botonManual = findViewById(R.id.opcion_manual)
         botonIA = findViewById(R.id.opcion_ia)
         contenedorTarjetas = findViewById(R.id.contenedor_tarjetas)
+        contenedorBotonesAgregar = findViewById(R.id.contenedor_botones_agregar)
         botonAceptar = findViewById(R.id.boton_aceptar)
 
         configurarToggle()
@@ -64,7 +69,7 @@ class AgregarDispositivoActivity : AppCompatActivity() {
             botonIA.setTextColor(resources.getColor(R.color.white, theme))
             botonManual.setBackgroundResource(R.drawable.fondo_toggle_no_seleccionado)
             botonManual.setTextColor(resources.getColor(R.color.black, theme))
-            ocultarTarjetas()
+            mostrarDetalleDispositivoParaIA()
         }
     }
 
@@ -81,11 +86,12 @@ class AgregarDispositivoActivity : AppCompatActivity() {
             }
 
             val dispositivo = Dispositivo(nombre = nombre, categoria = categoria, marca = marca, modelo = modelo)
-            val tarea = construirTarea()
-            val inspeccion = construirInspeccion()
+            val tareas = construirTareas()
+            val inspecciones = construirInspecciones()
 
             lifecycleScope.launch {
-                viewModel.guardarDispositivoConTareaEInspeccion(dispositivo, tarea, inspeccion)
+                val dispositivoId = viewModel.guardarDispositivoConTareaEInspeccion(dispositivo, null, null)
+                viewModel.guardarTareasEInspecciones(dispositivoId, tareas, inspecciones)
                 Toast.makeText(this@AgregarDispositivoActivity, "Dispositivo guardado", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()
@@ -93,45 +99,179 @@ class AgregarDispositivoActivity : AppCompatActivity() {
         }
     }
 
-    private fun construirTarea(): Tarea? {
-        val nombre = contenedorTarjetas.findViewById<EditText>(R.id.campo_nombre_tarea)?.text.toString().trim()
-        if (nombre.isEmpty()) return null
+    private fun construirTareas(): List<Tarea> {
+        val tareas = mutableListOf<Tarea>()
 
-        val desc = contenedorTarjetas.findViewById<EditText>(R.id.campo_descripcion)?.text.toString().trim()
-        val repetir = contenedorTarjetas.findViewById<Spinner>(R.id.spinner_repetir)?.selectedItem?.toString() ?: "Una vez"
-        val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
-            Date(contenedorTarjetas.findViewById<android.widget.CalendarView>(R.id.calendario_tarea)?.date ?: System.currentTimeMillis())
-        )
+        for (i in 0 until contenedorTarjetas.childCount) {
+            val vista = contenedorTarjetas.getChildAt(i)
+            val nombreCampo = vista.findViewById<EditText>(R.id.campo_nombre_tarea)
+            if (nombreCampo != null) {
+                val nombre = nombreCampo.text.toString().trim()
+                if (nombre.isNotEmpty()) {
+                    val desc = vista.findViewById<EditText>(R.id.campo_descripcion)?.text.toString().trim()
+                    val repetir = vista.findViewById<Spinner>(R.id.spinner_repetir)?.selectedItem?.toString() ?: "Una vez"
+                    val fecha = vista.findViewById<TextView>(R.id.texto_fecha_tarea)?.text.toString()
+                    tareas.add(Tarea(nombre = nombre, descripcion = desc, fecha = fecha, repetirCada = repetir))
+                }
+            }
+        }
 
-        return Tarea(nombre = nombre, descripcion = desc, fecha = fecha, repetirCada = repetir)
+        return tareas
     }
 
-    private fun construirInspeccion(): Inspeccion? {
-        val nombre = contenedorTarjetas.findViewById<EditText>(R.id.campo_nombre_inspeccion)?.text.toString().trim()
-        if (nombre.isEmpty()) return null
+    private fun construirInspecciones(): List<Inspeccion> {
+        val inspecciones = mutableListOf<Inspeccion>()
 
-        val desc = contenedorTarjetas.findViewById<EditText>(R.id.campo_descripcion_inspeccion)?.text.toString().trim()
-        val repetir = contenedorTarjetas.findViewById<Spinner>(R.id.spinner_repetir_inspeccion)?.selectedItem?.toString() ?: "Una vez"
-        val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
-            Date(contenedorTarjetas.findViewById<android.widget.CalendarView>(R.id.calendario_inspeccion)?.date ?: System.currentTimeMillis())
+        for (i in 0 until contenedorTarjetas.childCount) {
+            val vista = contenedorTarjetas.getChildAt(i)
+            val nombreCampo = vista.findViewById<EditText>(R.id.campo_nombre_inspeccion)
+            if (nombreCampo != null) {
+                val nombre = nombreCampo.text.toString().trim()
+                if (nombre.isNotEmpty()) {
+                    val desc = vista.findViewById<EditText>(R.id.campo_descripcion_inspeccion)?.text.toString().trim()
+                    val repetir = vista.findViewById<Spinner>(R.id.spinner_repetir_inspeccion)?.selectedItem?.toString() ?: "Una vez"
+                    val fecha = vista.findViewById<TextView>(R.id.texto_fecha_inspeccion)?.text.toString()
+                    inspecciones.add(Inspeccion(nombre = nombre, descripcion = desc, fecha = fecha, repetirCada = repetir))
+                }
+            }
+        }
+
+        return inspecciones
+    }
+
+
+    private fun configurarCalendarioPlegable(
+        vista: View,
+        textoFechaId: Int
+    ) {
+        val textoFecha = vista.findViewById<TextView>(textoFechaId) ?: return
+        val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val fechaSeleccionada = Calendar.getInstance()
+
+        textoFecha.text = formato.format(fechaSeleccionada.time)
+
+        textoFecha.setOnClickListener {
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    fechaSeleccionada.set(year, month, dayOfMonth)
+                    textoFecha.text = formato.format(fechaSeleccionada.time)
+                },
+                fechaSeleccionada.get(Calendar.YEAR),
+                fechaSeleccionada.get(Calendar.MONTH),
+                fechaSeleccionada.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+    }
+
+    private fun configurarCalendarioTarea(vista: View) {
+        configurarCalendarioPlegable(
+            vista,
+            R.id.texto_fecha_tarea
         )
+    }
 
-        return Inspeccion(nombre = nombre, descripcion = desc, fecha = fecha, repetirCada = repetir)
+    private fun configurarCalendarioInspeccion(vista: View) {
+        configurarCalendarioPlegable(
+            vista,
+            R.id.texto_fecha_inspeccion
+        )
     }
 
     private fun mostrarTarjetas() {
         contenedorTarjetas.removeAllViews()
-        val layouts = listOf(
-            R.layout.layout_detalle_dispositivo,
-            R.layout.layout_tarea,
-            R.layout.layout_inspeccion
-        )
-        for (layout in layouts) {
-            LayoutInflater.from(this).inflate(layout, contenedorTarjetas, true)
-        }
+        LayoutInflater.from(this).inflate(R.layout.layout_detalle_dispositivo, contenedorTarjetas, true)
+
+        val tarea = LayoutInflater.from(this).inflate(R.layout.layout_tarea, contenedorTarjetas, false)
+        configurarCalendarioTarea(tarea)
+        contenedorTarjetas.addView(tarea)
+
+        val inspeccion = LayoutInflater.from(this).inflate(R.layout.layout_inspeccion, contenedorTarjetas, false)
+        configurarCalendarioInspeccion(inspeccion)
+        contenedorTarjetas.addView(inspeccion)
+
+        agregarBotonesDinamicos()
     }
+
+    private fun mostrarDetalleDispositivoParaIA() {
+        contenedorTarjetas.removeAllViews()
+        contenedorBotonesAgregar.removeAllViews()
+        LayoutInflater.from(this).inflate(R.layout.layout_detalle_dispositivo, contenedorTarjetas, true)
+    }
+
+    private fun agregarBotonesDinamicos() {
+        contenedorBotonesAgregar.removeAllViews()
+
+        val botonTarea = Button(this).apply {
+            text = "+ Agregar Mantenimiento"
+            setAllCaps(false)
+            textSize = 13f
+            setTextColor(resources.getColor(R.color.white, theme))
+            setBackgroundColor(resources.getColor(R.color.purple_500, theme))
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                44.dp()
+            )
+            params.topMargin = 8
+            params.bottomMargin = 6
+            layoutParams = params
+            minHeight = 0
+        }
+
+        botonTarea.setOnClickListener {
+            if (!puedeAgregarTarjeta(R.id.campo_nombre_tarea, "Completa la tarea actual antes de agregar otra")) {
+                return@setOnClickListener
+            }
+            val tarea = LayoutInflater.from(this@AgregarDispositivoActivity).inflate(R.layout.layout_tarea, contenedorTarjetas, false)
+            configurarCalendarioTarea(tarea)
+            contenedorTarjetas.addView(tarea)
+        }
+
+        val botonInspeccion = Button(this).apply {
+            text = "+ Agregar Inspeccion"
+            setAllCaps(false)
+            textSize = 13f
+            setTextColor(resources.getColor(R.color.white, theme))
+            setBackgroundColor(resources.getColor(R.color.purple_500, theme))
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                44.dp()
+            )
+            params.topMargin = 0
+            params.bottomMargin = 6
+            layoutParams = params
+            minHeight = 0
+        }
+
+        botonInspeccion.setOnClickListener {
+            if (!puedeAgregarTarjeta(R.id.campo_nombre_inspeccion, "Completa la inspeccion actual antes de agregar otra")) {
+                return@setOnClickListener
+            }
+            val inspeccion = LayoutInflater.from(this@AgregarDispositivoActivity).inflate(R.layout.layout_inspeccion, contenedorTarjetas, false)
+            configurarCalendarioInspeccion(inspeccion)
+            contenedorTarjetas.addView(inspeccion)
+        }
+
+        contenedorBotonesAgregar.addView(botonTarea)
+        contenedorBotonesAgregar.addView(botonInspeccion)
+    }
+
+    private fun puedeAgregarTarjeta(campoNombreId: Int, mensaje: String): Boolean {
+        for (i in 0 until contenedorTarjetas.childCount) {
+            val campo = contenedorTarjetas.getChildAt(i).findViewById<EditText>(campoNombreId)
+            if (campo != null && campo.text.toString().trim().isEmpty()) {
+                campo.requestFocus()
+                Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
 
     private fun ocultarTarjetas() {
         contenedorTarjetas.removeAllViews()
+        contenedorBotonesAgregar.removeAllViews()
     }
 }
