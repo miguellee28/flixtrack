@@ -116,24 +116,27 @@ class TareaDetalleActivity : AppCompatActivity() {
             val detalles = withContext(Dispatchers.IO) {
                 tareaIds.flatMap { id -> viewModel.cargarDetallesPorTarea(id) }
             }
+            val detallesParaMostrar = detalles
+                .distinctBy { claveVisualDetalle(it) }
+                .sortedWith(compareBy<TareaDetalle> { ordenTipoDetalle(it.tipo) }.thenBy { it.nombre })
             detallesExistentes.clear()
             detallesExistentes.addAll(detalles)
             contenedorDetalles.removeAllViews()
             contenedorFotos.removeAllViews()
             fotosSeleccionadas.clear()
 
-            for (detalle in detalles) {
+            for (detalle in detallesParaMostrar) {
                 when (detalle.tipo) {
                     "mantenimiento" -> agregarTarjetaMantenimiento(detalle)
                     "inspeccion" -> agregarTarjetaInspeccion(detalle)
                 }
             }
 
-            detalles.flatMap { it.fotos }.distinct().forEach { ruta ->
+            detallesParaMostrar.flatMap { it.fotos }.distinct().forEach { ruta ->
                 agregarFotoPreview(ruta)
             }
 
-            if (detalles.isEmpty()) {
+            if (detallesParaMostrar.isEmpty()) {
                 val textoVacio = TextView(this@TareaDetalleActivity).apply {
                     text = "No hay detalles registrados"
                     textSize = 14f
@@ -142,6 +145,22 @@ class TareaDetalleActivity : AppCompatActivity() {
                 }
                 contenedorDetalles.addView(textoVacio)
             }
+        }
+    }
+
+    private fun ordenTipoDetalle(tipo: String): Int {
+        return when (tipo) {
+            "mantenimiento" -> 0
+            "inspeccion" -> 1
+            else -> 2
+        }
+    }
+
+    private fun claveVisualDetalle(detalle: TareaDetalle): String {
+        return if (detalle.tipo == "inspeccion") {
+            "${detalle.tipo}|${detalle.nombre}|${detalle.descripcion}"
+        } else {
+            "${detalle.tipo}|${detalle.tareaId}|${detalle.id}"
         }
     }
 
@@ -283,9 +302,23 @@ class TareaDetalleActivity : AppCompatActivity() {
                         vista.findViewById<Button>(R.id.boton_malo)?.alpha == 1.0f -> "malo"
                         else -> ""
                     }
-                    val fotos = (detalleExistente.fotos + fotosSeleccionadas).distinct()
-                    val actualizado = detalleExistente.copy(notas = notas, condicion = condicion, fotos = fotos, completada = true, fechaCompletada = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()))
-                    viewModel.actualizarTareaDetalle(actualizado)
+                    val fechaCompletada = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                    val detallesDuplicados = detallesExistentes.filter {
+                        it.tipo == "inspeccion" &&
+                            it.nombre == detalleExistente.nombre &&
+                            it.descripcion == detalleExistente.descripcion
+                    }
+                    for (detalleDuplicado in detallesDuplicados) {
+                        val fotos = (detalleDuplicado.fotos + fotosSeleccionadas).distinct()
+                        val actualizado = detalleDuplicado.copy(
+                            notas = notas,
+                            condicion = condicion,
+                            fotos = fotos,
+                            completada = true,
+                            fechaCompletada = fechaCompletada
+                        )
+                        viewModel.actualizarTareaDetalle(actualizado)
+                    }
                 }
             }
 
