@@ -27,10 +27,18 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AgregarDispositivoActivity" />
-        <activity android:name=".DetalleDispositivoActivity" />
-        <activity android:name=".AgregarTareaActivity" />
-        <activity android:name=".TareaDetalleActivity" />
+        <activity
+            android:name=".AgregarDispositivoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetalleDispositivoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AgregarTareaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TareaDetalleActivity"
+            android:exported="false" />
 
         <receiver
             android:name=".MaintenanceNotificationReceiver"

@@ -1,5 +1,6 @@
 package com.proyectofinal
 
+import com.proyectofinal.model.*
 import android.util.Base64
 import org.json.JSONArray
 import org.json.JSONObject

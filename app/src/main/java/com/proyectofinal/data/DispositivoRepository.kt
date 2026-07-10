@@ -1,7 +1,9 @@
-package com.proyectofinal
+package com.proyectofinal.data
 
+// Fuente única de acceso a los datos de dispositivos y tareas.
 import android.content.ContentValues
 import android.content.Context
+import com.proyectofinal.model.*
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -533,6 +535,18 @@ class DispositivoRepository(private val context: Context) {
             values,
             "${DatabaseHelper.COL_INSPECCION_ID} = ?",
             arrayOf(inspeccion.id.toString())
+        )
+    }
+
+    fun marcarInspeccionCompletada(id: Long): Int {
+        val values = ContentValues().apply {
+            put(DatabaseHelper.COL_INSPECCION_COMPLETADA, 1)
+        }
+        return dbHelper.writableDatabase.update(
+            DatabaseHelper.TABLE_INSPECCIONES,
+            values,
+            "${DatabaseHelper.COL_INSPECCION_ID} = ?",
+            arrayOf(id.toString())
         )
     }
 

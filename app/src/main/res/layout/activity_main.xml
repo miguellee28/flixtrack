@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -20,8 +21,11 @@
         android:id="@+id/barra_navegacion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@drawable/fondo_barra_navegacion"
+        android:elevation="12dp"
         app:labelVisibilityMode="labeled"
-        app:itemBackground="@drawable/selector_item_barra" />
+        app:itemBackground="@drawable/selector_item_barra"
+        app:itemIconTint="@color/color_item_navegacion"
+        app:itemTextColor="@color/color_item_navegacion" />
 
 </LinearLayout>

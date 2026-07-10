@@ -6,4 +6,7 @@
         android:endColor="@color/secondary_accent"
         android:startColor="@color/purple_500" />
     <corners android:radius="999dp" />
+    <padding
+        android:left="20dp"
+        android:right="20dp" />
 </shape>

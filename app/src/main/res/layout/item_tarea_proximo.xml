@@ -51,13 +51,13 @@
     <Button
         android:id="@+id/boton_ver"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:text="Ver"
         android:textAllCaps="false"
         android:textSize="14sp"
         android:textStyle="bold"
         android:minHeight="0dp"
-        android:backgroundTint="#6750A4" />
+        android:background="@drawable/fondo_boton_primario" />
 
 </LinearLayout>

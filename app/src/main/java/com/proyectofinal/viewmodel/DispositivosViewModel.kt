@@ -1,8 +1,12 @@
-package com.proyectofinal
+package com.proyectofinal.viewmodel
 
+// Estado y operaciones que consumen las pantallas.
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.proyectofinal.MaintenanceNotificationScheduler
+import com.proyectofinal.data.DispositivoRepository
+import com.proyectofinal.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -149,6 +153,16 @@ class DispositivosViewModel(app: Application) : AndroidViewModel(app) {
             reprogramarNotificaciones()
             cargarInspecciones()
         }
+    }
+
+    suspend fun marcarInspeccionCompletada(id: Long) {
+        withContext(Dispatchers.IO) {
+            repository.marcarInspeccionCompletada(id)
+        }
+        reprogramarNotificaciones()
+        cargarInspecciones()
+        cargarHomeData()
+        cargarCalendarioData()
     }
 
     // ==================== HOME DATA ====================

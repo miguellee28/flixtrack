@@ -2,26 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:paddingStart="28dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Dispositivos"
-            android:textSize="24sp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="-0.02"
+            android:textColor="@color/text_primary"
+            android:textSize="32sp"
             android:textStyle="bold" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_color" />
+        android:layout_height="8dp"
+        android:background="@color/app_background" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -65,8 +72,12 @@
     <Button
         android:id="@+id/boton_agregar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/primary_action_height"
         android:layout_margin="16dp"
-        android:text="Agregar un nuevo dispositivo" />
+        android:minHeight="0dp"
+        android:text="Agregar un nuevo dispositivo"
+        android:textSize="15sp"
+        android:background="@drawable/fondo_boton_primario"
+        android:backgroundTint="@null" />
 
 </LinearLayout>

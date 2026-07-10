@@ -1,5 +1,7 @@
 package com.proyectofinal
 
+import com.proyectofinal.model.*
+import com.proyectofinal.viewmodel.DispositivosViewModel
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -39,6 +41,9 @@ class TareaDetalleActivity : AppCompatActivity() {
         const val EXTRA_DISPOSITIVO_NOMBRE = "dispositivo_nombre"
         const val EXTRA_TAREA_FECHA = "tarea_fecha"
         const val EXTRA_SOLO_LECTURA = "solo_lectura"
+        const val EXTRA_INSPECCION_NOMBRE = "inspeccion_nombre"
+        const val EXTRA_INSPECCION_DESCRIPCION = "inspeccion_descripcion"
+        const val EXTRA_INSPECCION_ID = "inspeccion_id"
     }
 
     private lateinit var viewModel: DispositivosViewModel
@@ -53,6 +58,8 @@ class TareaDetalleActivity : AppCompatActivity() {
     private val fotosSeleccionadas = mutableListOf<String>()
     private val detallesExistentes = mutableListOf<TareaDetalle>()
     private var soloLectura: Boolean = false
+    private var inspeccionDirecta: TareaDetalle? = null
+    private var inspeccionDirectaId: Long = 0
 
     private val resultadoCamara = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -84,7 +91,7 @@ class TareaDetalleActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_tarea_detalle)
 
-        viewModel = ViewModelProvider(this, DispositivosViewModelFactory(application))[DispositivosViewModel::class.java]
+        viewModel = ViewModelProvider(this)[DispositivosViewModel::class.java]
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { vista, insets ->
             val barrasSistema = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -105,9 +112,28 @@ class TareaDetalleActivity : AppCompatActivity() {
         soloLectura = intent.getBooleanExtra(EXTRA_SOLO_LECTURA, false)
         val dispositivoNombre = intent.getStringExtra(EXTRA_DISPOSITIVO_NOMBRE) ?: ""
         val tareaFecha = intent.getStringExtra(EXTRA_TAREA_FECHA) ?: ""
+        val nombreInspeccion = intent.getStringExtra(EXTRA_INSPECCION_NOMBRE).orEmpty()
+        val descripcionInspeccion = intent.getStringExtra(EXTRA_INSPECCION_DESCRIPCION).orEmpty()
+        inspeccionDirectaId = intent.getLongExtra(EXTRA_INSPECCION_ID, 0)
 
-        findViewById<TextView>(R.id.texto_nombre_tarea).text = dispositivoNombre.ifBlank { "Sin dispositivo" }
-        findViewById<TextView>(R.id.texto_nombre_dispositivo).visibility = View.GONE
+        if (nombreInspeccion.isNotBlank()) {
+            inspeccionDirecta = TareaDetalle(
+                tareaId = 0,
+                tipo = "inspeccion",
+                nombre = nombreInspeccion,
+                descripcion = descripcionInspeccion
+            )
+        }
+
+        findViewById<TextView>(R.id.texto_nombre_tarea).text = if (inspeccionDirecta != null) {
+            "Inspección"
+        } else {
+            dispositivoNombre.ifBlank { "Sin dispositivo" }
+        }
+        findViewById<TextView>(R.id.texto_nombre_dispositivo).apply {
+            visibility = if (inspeccionDirecta != null) View.VISIBLE else View.GONE
+            text = dispositivoNombre.ifBlank { "Sin dispositivo" }
+        }
         findViewById<TextView>(R.id.texto_fecha).text = tareaFecha
 
         cargarDetalles()
@@ -116,7 +142,7 @@ class TareaDetalleActivity : AppCompatActivity() {
 
     private fun cargarDetalles() {
         lifecycleScope.launch {
-            val detalles = withContext(Dispatchers.IO) {
+            val detalles = inspeccionDirecta?.let { listOf(it) } ?: withContext(Dispatchers.IO) {
                 tareaIds.flatMap { id -> viewModel.cargarDetallesPorTarea(id) }
             }
             val detallesParaMostrar = detalles
@@ -144,7 +170,7 @@ class TareaDetalleActivity : AppCompatActivity() {
                     text = "No hay detalles registrados"
                     textSize = 14f
                     setTextColor(resources.getColor(R.color.text_secondary, theme))
-                    setPadding(0, 16, 0, 16)
+                    setPadding(0, 16.dp(), 0, 16.dp())
                 }
                 contenedorDetalles.addView(textoVacio)
             }
@@ -265,6 +291,7 @@ class TareaDetalleActivity : AppCompatActivity() {
         val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", archivoFoto)
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         }
         resultadoCamara.launch(intent)
     }
@@ -310,6 +337,14 @@ class TareaDetalleActivity : AppCompatActivity() {
 
     private fun guardarDetalles() {
         lifecycleScope.launch {
+            if (inspeccionDirectaId > 0) {
+                viewModel.marcarInspeccionCompletada(inspeccionDirectaId)
+                Toast.makeText(this@TareaDetalleActivity, "Inspección completada", Toast.LENGTH_SHORT).show()
+                setResult(RESULT_OK)
+                finish()
+                return@launch
+            }
+
             for (i in 0 until contenedorDetalles.childCount) {
                 val vista = contenedorDetalles.getChildAt(i)
                 val detalleId = vista.tag as? Long ?: continue
@@ -361,4 +396,6 @@ class TareaDetalleActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
 }

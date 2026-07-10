@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/color_tarjeta"
-    android:padding="12dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
+    android:background="@drawable/fondo_tarjeta"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
     android:layout_marginTop="16dp"
     android:layout_marginBottom="4dp">
 
@@ -15,14 +16,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="-0.01"
+        android:textSize="22sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/texto_contador"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#999999" />
+        android:textSize="13sp"
+        android:textColor="@color/text_tertiary" />
 
 </LinearLayout>

@@ -1,5 +1,6 @@
-package com.proyectofinal
+package com.proyectofinal.model
 
+// Entidades de dominio usadas por la aplicación.
 data class Dispositivo(
     val id: Long = 0,
     val nombre: String,

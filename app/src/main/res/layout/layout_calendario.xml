@@ -2,26 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:paddingStart="28dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Calendario"
-            android:textSize="24sp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="-0.02"
+            android:textColor="@color/text_primary"
+            android:textSize="32sp"
             android:textStyle="bold" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCCCCC" />
+        android:layout_height="8dp"
+        android:background="@color/app_background" />
 
     <!-- Tabs -->
     <LinearLayout
@@ -39,9 +46,13 @@
             android:text="Proximo"
             android:textAllCaps="false"
             android:textSize="13sp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:backgroundTint="#6750A4"
+            android:background="@drawable/fondo_boton_tab"
             android:textColor="@color/white" />
 
         <Button
@@ -53,9 +64,13 @@
             android:text="Atrasado"
             android:textAllCaps="false"
             android:textSize="13sp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:backgroundTint="#6750A4"
+            android:background="@drawable/fondo_boton_tab"
             android:textColor="@color/white" />
 
         <Button
@@ -66,9 +81,13 @@
             android:text="Completado"
             android:textAllCaps="false"
             android:textSize="13sp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:backgroundTint="#6750A4"
+            android:background="@drawable/fondo_boton_tab"
             android:textColor="@color/white" />
 
     </LinearLayout>
@@ -85,9 +104,12 @@
     <Button
         android:id="@+id/boton_agregar_tarea_calendario"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/primary_action_height"
         android:layout_margin="16dp"
         android:text="+ Agregar Tarea"
-        android:textAllCaps="false" />
+        android:minHeight="0dp"
+        android:textAllCaps="false"
+        android:background="@drawable/fondo_boton_primario"
+        android:backgroundTint="@null" />
 
 </LinearLayout>

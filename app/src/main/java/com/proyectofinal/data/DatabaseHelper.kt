@@ -1,5 +1,6 @@
-package com.proyectofinal
+package com.proyectofinal.data
 
+// Gestión local de la base de datos SQLite.
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper

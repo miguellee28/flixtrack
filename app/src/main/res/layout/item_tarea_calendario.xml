@@ -45,7 +45,7 @@
         <Button
             android:id="@+id/boton_ver"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="44dp"
             android:text="Ver"
             android:textAllCaps="false"
             android:textSize="12sp"
@@ -53,7 +53,7 @@
             android:minHeight="0dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:backgroundTint="#6750A4" />
+            android:background="@drawable/fondo_boton_primario" />
 
     </LinearLayout>
 

@@ -1,5 +1,7 @@
 package com.proyectofinal
 
+import com.proyectofinal.model.*
+import com.proyectofinal.viewmodel.DispositivosViewModel
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -40,7 +42,6 @@ class DetalleDispositivoActivity : AppCompatActivity() {
     private lateinit var campoModelo: EditText
     private lateinit var spinnerCategoria: Spinner
     private lateinit var botonGuardar: Button
-    private lateinit var botonCompartir: Button
     private lateinit var botonEliminar: Button
     private lateinit var botonEditarCalendario: TextView
     private lateinit var contenedorCalendario: LinearLayout
@@ -80,7 +81,7 @@ class DetalleDispositivoActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_detalle_dispositivo)
 
-        viewModel = ViewModelProvider(this, DispositivosViewModelFactory(application))[DispositivosViewModel::class.java]
+        viewModel = ViewModelProvider(this)[DispositivosViewModel::class.java]
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { vista, insets ->
             val barrasSistema = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -93,7 +94,6 @@ class DetalleDispositivoActivity : AppCompatActivity() {
         campoModelo = findViewById(R.id.campo_modelo)
         spinnerCategoria = findViewById(R.id.spinner_categoria)
         botonGuardar = findViewById(R.id.boton_guardar)
-        botonCompartir = findViewById(R.id.boton_compartir)
         botonEliminar = findViewById(R.id.boton_eliminar_dispositivo)
         botonEditarCalendario = findViewById(R.id.boton_editar_calendario)
         contenedorCalendario = findViewById(R.id.contenedor_calendario_dispositivo)
@@ -143,19 +143,6 @@ class DetalleDispositivoActivity : AppCompatActivity() {
                 Toast.makeText(this@DetalleDispositivoActivity, "Dispositivo actualizado", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()
-            }
-        }
-
-        botonCompartir.setOnClickListener {
-            val texto = "Dispositivo: ${campoNombre.text}\nMarca: ${campoMarca.text}\nModelo: ${campoModelo.text}\nCategoría: ${spinnerCategoria.selectedItem}"
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, texto)
-            }
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(Intent.createChooser(intent, "Compartir dispositivo"))
-            } else {
-                Toast.makeText(this, "No hay apps disponibles para compartir", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -215,7 +202,7 @@ class DetalleDispositivoActivity : AppCompatActivity() {
                 text = "No hay mantenimientos ni inspecciones registradas"
                 textSize = 14f
                 setTextColor(resources.getColor(R.color.text_secondary, theme))
-                setPadding(16, 12, 16, 12)
+                setPadding(16.dp(), 12.dp(), 16.dp(), 12.dp())
             }
             contenedorCalendario.addView(vacio)
             return
@@ -269,12 +256,12 @@ class DetalleDispositivoActivity : AppCompatActivity() {
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(R.drawable.fondo_tarjeta)
-            setPadding(16, 14, 16, 14)
+            setPadding(16.dp(), 14.dp(), 16.dp(), 14.dp())
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(4, 0, 4, 8)
+                setMargins(4.dp(), 0, 4.dp(), 8.dp())
             }
 
             addView(TextView(this@DetalleDispositivoActivity).apply {
@@ -287,7 +274,7 @@ class DetalleDispositivoActivity : AppCompatActivity() {
                 text = item.nombre
                 textSize = 16f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setPadding(0, 4, 0, 2)
+                setPadding(0, 4.dp(), 0, 2.dp())
             })
             addView(TextView(this@DetalleDispositivoActivity).apply {
                 text = item.descripcion.ifBlank { "Sin descripcion" }
@@ -298,8 +285,10 @@ class DetalleDispositivoActivity : AppCompatActivity() {
                 text = "Repite: ${item.repetirCada}"
                 textSize = 12f
                 setTextColor(resources.getColor(R.color.text_secondary, theme))
-                setPadding(0, 6, 0, 0)
+                setPadding(0, 6.dp(), 0, 0)
             })
         }
     }
+
+    private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
 }

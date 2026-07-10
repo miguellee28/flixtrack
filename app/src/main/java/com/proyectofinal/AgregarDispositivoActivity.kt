@@ -1,5 +1,7 @@
 package com.proyectofinal
 
+import com.proyectofinal.model.*
+import com.proyectofinal.viewmodel.DispositivosViewModel
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -87,7 +89,7 @@ class AgregarDispositivoActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_agregar_dispositivo)
 
-        viewModel = ViewModelProvider(this, DispositivosViewModelFactory(application))[DispositivosViewModel::class.java]
+        viewModel = ViewModelProvider(this)[DispositivosViewModel::class.java]
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { vista, insets ->
             val barrasSistema = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -267,12 +269,12 @@ class AgregarDispositivoActivity : AppCompatActivity() {
         val panel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(R.drawable.fondo_tarjeta)
-            setPadding(16, 14, 16, 14)
+            setPadding(16.dp(), 14.dp(), 16.dp(), 14.dp())
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(4, 0, 4, 16)
+                setMargins(4.dp(), 0, 4.dp(), 16.dp())
             }
         }
 
@@ -280,26 +282,34 @@ class AgregarDispositivoActivity : AppCompatActivity() {
             text = "Asistente IA"
             textSize = 18f
             setTypeface(typeface, android.graphics.Typeface.BOLD)
-            setPadding(0, 0, 0, 8)
+            setPadding(0, 0, 0, 8.dp())
         })
 
         panel.addView(TextView(this).apply {
             text = "Toca la foto del dispositivo para agregar una imagen opcional."
             textSize = 13f
             setTextColor(resources.getColor(R.color.text_secondary, theme))
-            setPadding(0, 0, 0, 10)
+            setPadding(0, 0, 0, 10.dp())
         })
 
         botonBuscarIA = Button(this).apply {
             text = "Buscar mantenimiento con IA"
             setAllCaps(false)
+            textSize = 14f
+            setTextColor(resources.getColor(R.color.white, theme))
+            setBackgroundResource(R.drawable.fondo_boton_primario)
+            minHeight = 0
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                44.dp()
+            )
             setOnClickListener { buscarMantenimientoConIA() }
         }
         panel.addView(botonBuscarIA)
 
         textoEstadoIA = TextView(this).apply {
             textSize = 13f
-            setPadding(0, 10, 0, 4)
+            setPadding(0, 10.dp(), 0, 4.dp())
             setTextColor(resources.getColor(R.color.text_secondary, theme))
         }
         panel.addView(textoEstadoIA)
@@ -562,6 +572,7 @@ class AgregarDispositivoActivity : AppCompatActivity() {
         val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", archivoFoto)
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         }
         resultadoCamaraIA.launch(intent)
     }
@@ -579,13 +590,13 @@ class AgregarDispositivoActivity : AppCompatActivity() {
             setAllCaps(false)
             textSize = 13f
             setTextColor(resources.getColor(R.color.white, theme))
-            setBackgroundColor(resources.getColor(R.color.purple_500, theme))
+            setBackgroundResource(R.drawable.fondo_boton_primario)
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 44.dp()
             )
-            params.topMargin = 8
-            params.bottomMargin = 6
+            params.topMargin = 8.dp()
+            params.bottomMargin = 6.dp()
             layoutParams = params
             minHeight = 0
         }
@@ -604,13 +615,13 @@ class AgregarDispositivoActivity : AppCompatActivity() {
             setAllCaps(false)
             textSize = 13f
             setTextColor(resources.getColor(R.color.white, theme))
-            setBackgroundColor(resources.getColor(R.color.purple_500, theme))
+            setBackgroundResource(R.drawable.fondo_boton_primario)
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 44.dp()
             )
             params.topMargin = 0
-            params.bottomMargin = 6
+            params.bottomMargin = 6.dp()
             layoutParams = params
             minHeight = 0
         }

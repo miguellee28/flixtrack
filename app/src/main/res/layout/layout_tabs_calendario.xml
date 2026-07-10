@@ -14,9 +14,13 @@
         android:text="Proximo"
         android:textAllCaps="false"
         android:textSize="13sp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:backgroundTint="#6750A4"
+        android:background="@drawable/fondo_boton_tab"
         android:textColor="@color/white" />
 
     <Button
@@ -28,9 +32,13 @@
         android:text="Atrasado"
         android:textAllCaps="false"
         android:textSize="13sp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:backgroundTint="#6750A4"
+        android:background="@drawable/fondo_boton_tab"
         android:textColor="@color/white" />
 
     <Button
@@ -41,9 +49,13 @@
         android:text="Completado"
         android:textAllCaps="false"
         android:textSize="13sp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:backgroundTint="#6750A4"
+        android:background="@drawable/fondo_boton_tab"
         android:textColor="@color/white" />
 
 </LinearLayout>

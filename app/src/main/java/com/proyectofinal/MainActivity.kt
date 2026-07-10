@@ -1,5 +1,7 @@
 package com.proyectofinal
 
+import com.proyectofinal.model.*
+import com.proyectofinal.viewmodel.DispositivosViewModel
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -42,12 +44,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var barraNavegacion: BottomNavigationView
     private lateinit var contenedorPantallas: FrameLayout
     private lateinit var viewModel: DispositivosViewModel
+    private var pantallaActual = ID_INICIO
 
     companion object {
         private const val ID_INICIO = 1
         private const val ID_CALENDARIO = 2
         private const val ID_DISPOSITIVOS = 3
         private const val ID_AJUSTES = 4
+        private const val ESTADO_PANTALLA_ACTUAL = "pantalla_actual"
         const val PREFS_NAME = "mis_preferencias"
         const val PREFS_TEMA_OSCURO = "tema_oscuro"
     }
@@ -84,13 +88,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        pantallaActual = savedInstanceState?.getInt(ESTADO_PANTALLA_ACTUAL, ID_INICIO) ?: ID_INICIO
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
         barraNavegacion = findViewById(R.id.barra_navegacion)
         contenedorPantallas = findViewById(R.id.contenedor_pantallas)
 
-        viewModel = ViewModelProvider(this, DispositivosViewModelFactory(application))[DispositivosViewModel::class.java]
+        viewModel = ViewModelProvider(this)[DispositivosViewModel::class.java]
         solicitarPermisoNotificaciones()
         MaintenanceNotificationScheduler.scheduleAll(this)
 
@@ -105,6 +110,11 @@ class MainActivity : AppCompatActivity() {
         observarDispositivos()
         observarHomeData()
         observarCalendarioData()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(ESTADO_PANTALLA_ACTUAL, pantallaActual)
+        super.onSaveInstanceState(outState)
     }
 
     private fun solicitarPermisoNotificaciones() {
@@ -202,7 +212,7 @@ class MainActivity : AppCompatActivity() {
             val vacio = TextView(this).apply {
                 text = "No hay tareas atrasadas"
                 textSize = 14f
-                setPadding(32, 16, 32, 16)
+                setPadding(32.dp(), 16.dp(), 32.dp(), 16.dp())
                 setTextColor(resources.getColor(R.color.text_secondary, theme))
             }
             seccion.addView(vacio)
@@ -226,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             val vacio = TextView(this).apply {
                 text = "No hay tareas pendientes"
                 textSize = 14f
-                setPadding(32, 16, 32, 16)
+                setPadding(32.dp(), 16.dp(), 32.dp(), 16.dp())
                 setTextColor(resources.getColor(R.color.text_secondary, theme))
             }
             seccion.addView(vacio)
@@ -256,7 +266,7 @@ class MainActivity : AppCompatActivity() {
             val vacio = TextView(this).apply {
                 text = "No hay tareas proximas"
                 textSize = 14f
-                setPadding(32, 16, 32, 16)
+                setPadding(32.dp(), 16.dp(), 32.dp(), 16.dp())
                 setTextColor(resources.getColor(R.color.text_secondary, theme))
             }
             seccion.addView(vacio)
@@ -270,6 +280,8 @@ class MainActivity : AppCompatActivity() {
     private fun agruparPorFechaYDispositivo(items: List<ItemProgramado>): List<List<ItemProgramado>> {
         return items.groupBy { Pair(it.fecha, it.nombreDispositivo.ifBlank { "Sin dispositivo" }) }.values.toList()
     }
+
+    private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
 
     private fun agregarCardGrupoInicio(seccion: LinearLayout, grupo: List<ItemProgramado>, atrasada: Boolean) {
         val primero = grupo.firstOrNull() ?: return
@@ -313,9 +325,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun itemsVisiblesGrupo(grupo: List<ItemProgramado>): List<ItemProgramado> {
-        val unicos = grupo.distinctBy { "${it.tipo}:${it.nombre.trim().lowercase()}:${it.fecha}" }
-        val tareas = unicos.filter { it.tipo == "tarea" }
-        return tareas.ifEmpty { unicos }
+        return grupo.distinctBy { "${it.tipo}:${it.nombre.trim().lowercase()}:${it.fecha}" }
     }
 
     private fun abrirDetalleGrupo(grupo: List<ItemProgramado>, soloLectura: Boolean = false) {
@@ -332,7 +342,7 @@ class MainActivity : AppCompatActivity() {
             }
             resultadoTareaDetalle.launch(intent)
         } else {
-            abrirDetalleItem(grupo.first())
+            abrirDetalleInspeccion(grupo.first(), soloLectura)
         }
     }
 
@@ -359,7 +369,7 @@ class MainActivity : AppCompatActivity() {
             procesarSeleccion(elemento)
         }
 
-        barraNavegacion.selectedItemId = ID_INICIO
+        barraNavegacion.selectedItemId = pantallaActual
     }
 
     private fun agregarOpcion(menu: Menu, id: Int, icono: Int, titulo: String) {
@@ -367,6 +377,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun procesarSeleccion(elemento: MenuItem): Boolean {
+        pantallaActual = elemento.itemId
         return when (elemento.itemId) {
             ID_INICIO -> {
                 mostrarInicio()
@@ -551,13 +562,20 @@ class MainActivity : AppCompatActivity() {
             }
             resultadoTareaDetalle.launch(intent)
         } else {
-            val dispositivo = item.nombreDispositivo.ifBlank { "Sin dispositivo" }
-            AlertDialog.Builder(this)
-                .setTitle(item.nombre)
-                .setMessage("Inspeccion\nFecha: ${item.fecha}\nDispositivo: $dispositivo\n\n${item.descripcion}")
-                .setPositiveButton("Cerrar", null)
-                .show()
+            abrirDetalleInspeccion(item, viewModel.tareaSeleccionada.value == "completado")
         }
+    }
+
+    private fun abrirDetalleInspeccion(item: ItemProgramado, soloLectura: Boolean) {
+        val intent = Intent(this, TareaDetalleActivity::class.java).apply {
+            putExtra(TareaDetalleActivity.EXTRA_INSPECCION_ID, item.id)
+            putExtra(TareaDetalleActivity.EXTRA_INSPECCION_NOMBRE, item.nombre)
+            putExtra(TareaDetalleActivity.EXTRA_INSPECCION_DESCRIPCION, item.descripcion)
+            putExtra(TareaDetalleActivity.EXTRA_DISPOSITIVO_NOMBRE, item.nombreDispositivo)
+            putExtra(TareaDetalleActivity.EXTRA_TAREA_FECHA, item.fecha)
+            putExtra(TareaDetalleActivity.EXTRA_SOLO_LECTURA, soloLectura)
+        }
+        resultadoTareaDetalle.launch(intent)
     }
 
     private fun configurarAjustes() {
@@ -670,9 +688,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun itemsVisiblesGrupoCalendario(grupo: List<ItemProgramado>): List<ItemProgramado> {
-            val unicos = grupo.distinctBy { "${it.tipo}:${it.nombre.trim().lowercase()}:${it.fecha}" }
-            val tareas = unicos.filter { it.tipo == "tarea" }
-            return tareas.ifEmpty { unicos }
+            return grupo.distinctBy { "${it.tipo}:${it.nombre.trim().lowercase()}:${it.fecha}" }
         }
     }
 }

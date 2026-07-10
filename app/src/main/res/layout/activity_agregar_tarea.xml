@@ -3,6 +3,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     android:orientation="vertical"
     android:paddingStart="16dp"
     android:paddingTop="16dp"
@@ -12,7 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Agregar Tarea"
-        android:textSize="24sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="-0.02"
+        android:textColor="@color/text_primary"
+        android:textSize="30sp"
         android:textStyle="bold"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
@@ -37,7 +41,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/fondo_tarjeta"
-                android:padding="12dp"
+                android:elevation="2dp"
+                android:padding="20dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp">
@@ -84,9 +89,12 @@
             android:layout_height="44dp"
             android:text="+ Agregar Mantenimiento"
             android:textAllCaps="false"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/white"
             android:textSize="13sp"
             android:minHeight="0dp"
-            android:backgroundTint="#6750A4" />
+            android:background="@drawable/fondo_boton_primario"
+            android:backgroundTint="@null" />
 
         <Button
             android:id="@+id/boton_agregar_inspeccion"
@@ -95,9 +103,12 @@
             android:layout_marginTop="6dp"
             android:text="+ Agregar Inspeccion"
             android:textAllCaps="false"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/white"
             android:textSize="13sp"
             android:minHeight="0dp"
-            android:backgroundTint="#6750A4" />
+            android:background="@drawable/fondo_boton_primario"
+            android:backgroundTint="@null" />
 
     </LinearLayout>
 
@@ -105,9 +116,11 @@
     <Button
         android:id="@+id/boton_guardar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_margin="16dp"
         android:text="Guardar"
+        android:background="@drawable/fondo_boton_primario"
+        android:minHeight="0dp"
         android:textAllCaps="false" />
 
 </LinearLayout>

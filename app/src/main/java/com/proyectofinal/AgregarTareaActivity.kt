@@ -1,5 +1,7 @@
 package com.proyectofinal
 
+import com.proyectofinal.model.*
+import com.proyectofinal.viewmodel.DispositivosViewModel
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -46,7 +48,7 @@ class AgregarTareaActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_agregar_tarea)
 
-        viewModel = ViewModelProvider(this, DispositivosViewModelFactory(application))[DispositivosViewModel::class.java]
+        viewModel = ViewModelProvider(this)[DispositivosViewModel::class.java]
         dispositivoInicialId = intent.getLongExtra(EXTRA_DISPOSITIVO_ID, 0)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { vista, insets ->
